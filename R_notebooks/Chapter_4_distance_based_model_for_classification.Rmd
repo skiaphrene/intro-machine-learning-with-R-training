@@ -312,7 +312,7 @@ Before we were optimizing for $R^2$, which appropriate for regression tasks, but
      * `weight_func` : try rectangular, triangular, and optimal
      * `neighbors` : can take values between 1 and 30
 
-```
+```{r}
 # we add a normalization step, so we need a recipe:
 blobs_recipe <- recipe( label ~ . , data = X_train) %>%
   step_normalize(all_predictors())
@@ -327,7 +327,12 @@ blobs_wf <-
   add_recipe( blobs_recipe )
 
 ## prepare the grid of hyper-parameter values to test:
-blobs_grid <- grid_regular( ... ) ## setup the hyper parameters here
+# blobs_grid <- grid_regular( ... ) ## setup the hyper parameters here
+blobs_grid <- grid_regular( neighbors(range = c(1,30)) , 
+                            weight_func( values = c('rectangular',
+                                                    'triangular',
+                                                    'optimal')),
+                            levels = 30)
 
 ## Cross-Validation setup
 folds <- vfold_cv(X_train, v = 5)
@@ -338,7 +343,8 @@ blobs_res <-
   tune_grid(
     resamples = folds,
     grid = blobs_grid,
-    metrics = ... ## add the proper score here
+    # metrics = ... ## add the proper score here
+    metrics = metric_set( accuracy )
     )
 ```
 
