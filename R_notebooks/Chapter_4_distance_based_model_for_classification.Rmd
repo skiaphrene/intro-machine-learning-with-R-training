@@ -9,15 +9,18 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-In this chapter we will **only talk about classification**. Classifiers associate a transformed set of features to a set of classes (a discrete variable)
+In this chapter, we will **only talk about classification**. Classifiers assign observations to two or more classes (ie a discrete variable).
 
-![class_reg](../images/class_reg.png)
+![Classification/Regression illustration](../images/class_reg.png)
 
-In this notebook we are going to focus on distance based classification method (opposed to decision tree for example wich works with threshold more than actual distances). The goal is to give you some insight on 4 different levels: 
+In this notebook, we are going to focus on distance-based classification methods (as opposed to decision trees for example, which work with thresholds on features rather than distances between observations). The goal is to give you some insight on 4 different levels: 
+
  - **Best practices**
- - **Intuition on the concepts behind those methods**
- - **How to implement them with tidymodels** 
- - **Intuition on the different parameters that your model need but are not trainable (hyperparameters)**
+ - **Concepts behind these methods**
+ - **Implementation with tidymodels** 
+ - **Parameters that your model needs, but that are not trainable (hyperparameters)**
+
+<!-- TBD: not sure we can call hyperparameters non-trainable unless the total data is too small to make validation sets? -->
 
 ```{r}
 library(tidyr)
