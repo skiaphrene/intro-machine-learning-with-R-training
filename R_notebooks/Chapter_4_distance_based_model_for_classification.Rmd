@@ -13,6 +13,7 @@ In this chapter, we will **only talk about classification**. Classifiers assign 
 
 ![Classification/Regression illustration](../images/class_reg.png)
 
+
 In this notebook, we are going to focus on distance-based classification methods (as opposed to decision trees for example, which work with thresholds on features rather than distances between observations). The goal is to give you some insight on 4 different levels: 
 
  - **Best practices**
@@ -39,11 +40,14 @@ library(themis)
 
 ```
 
+
 # Meet the data 
 
-## Binary class dataset : breast cancer
+## Binary class dataset: breast cancer
 
-In the cancer dataset you have 569 tumors for which many features have been measured. The goal is to predict if the tumor is malignant or not.
+In the cancer dataset, there are 569 tumors for which many visible features have been measured. The goal is to predict if the tumor is malignant or not.
+
+<!-- TBD: there's a way to set up the relevant level to a more standard R comprehension. -->
 
 ```{r}
 BreastCancer <- read.csv("../data/breast_cancer.csv")
@@ -77,21 +81,22 @@ table( BreastCancer$malignant  )
 So, there is a slight over-representation of benign tumors.
 
 ```{r}
-cor_matrix = cor( BreastCancer[ , -11], method = "pearson" )
+cor_matrix = cor( BreastCancer[ , -which(colnames(BreastCancer)=="malignant")], 
+                  method = "pearson" ) # Pearson (parametric, linear) correlation
 palette <- colorRampPalette(c("blue","white","red"))(100)
 pheatmap(cor_matrix,
          display_numbers = TRUE,
           color=palette, breaks=seq(-1,1,length.out=100))
 ```
 
-So it looks some of these features are extremely correlated, so we may drop some of the most egregious cases
+So it looks some of these features are extremely correlated, so we may drop some of the most egregious cases.
 
 ```{r}
 BreastCancer <- BreastCancer %>% select( !c(mean.area,mean.perimeter,mean.concave.points)  ) 
 
 ```
 
-> here we do this manually, but it is also possible to add a [high correlation filter step](https://recipes.tidymodels.org/reference/step_corr.html) to our recipe
+> Here we do this manually, but it is also possible to add a [high correlation filter step](https://recipes.tidymodels.org/reference/step_corr.html) to our recipe.
 
 # K-nearest neighbors + some basic routine
 
