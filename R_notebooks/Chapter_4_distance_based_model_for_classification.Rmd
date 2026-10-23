@@ -98,28 +98,29 @@ BreastCancer <- BreastCancer %>% select( !c(mean.area,mean.perimeter,mean.concav
 
 > Here we do this manually, but it is also possible to add a [high correlation filter step](https://recipes.tidymodels.org/reference/step_corr.html) to our recipe.
 
+
 # K-nearest neighbors + some basic routine
 
-K-nearest neighbors is a pretty simple algorithm in terms of concept but it already has few hyperparameters that you should understand and try to optimize. It will introduce you to some of the very experimental like routine that machine learning is.
+K-nearest neighbors is conceptually a pretty simple algorithm, but it already has a few hyperparameters that you should understand and try to optimize. It will introduce you to the experimental nature of machine learning.
 
-For a classifier, [k-nearest neighbors](https://parsnip.tidymodels.org/reference/nearest_neighbor.html) works as follow.
+For a classifier, [k-nearest neighbors](https://parsnip.tidymodels.org/reference/nearest_neighbor.html) works as follows.
 
-**First the algorithm simply saves the labels that it is given during the training phase**.
+**First, the algorithm simply saves the labels that it is given during the training phase**.
 
-Then during the testing phase it takes a testing point and checks its `neighbors` nearest neighbors.
+Then, during the testing phase it picks a random testing point and checks its `neighbors` nearest neighbors.
 
-**If `neighbors` nearest neighbors are mostly (in majority) from one label then the tested point will be assigned this label**.
+**If `neighbors` nearest neighbors are mostly (in majority) from one label, then the tested point will be assigned this label**.
 
 The way the `neighbors` **nearest neighbors vote** can be either
 
--   uniform (every point as the same importance in the vote) or,
+-   uniform (every point has the same importance) or,
 -   distance-based (a point distant to the tested point by a distance d will have a weight of 1/d in the vote).
 
-![knn](../images/knn.png)
+![kNN illustration](../images/knn.png)
 
 [Image from datacamp tutorials](https://www.datacamp.com/community/tutorials/k-nearest-neighbor-classification-scikit-learn)
 
-[Back to the ToC](#toc)
+[Back to the ToC](#toc) <!-- TBD: doesn't work - could not see a TOC in this file -->
 
 ### Toy dataset: KNN concepts and hyperparameters
 
