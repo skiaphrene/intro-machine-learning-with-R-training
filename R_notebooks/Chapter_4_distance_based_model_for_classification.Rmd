@@ -124,6 +124,7 @@ The way the `neighbors` **nearest neighbors vote** can be either
 
 ### Toy dataset: KNN concepts and hyperparameters
 
+#### Example data
 ```{r}
 set.seed(123)
 blob1 = data.frame( x = rnorm(30 , mean = -7 ),
@@ -138,10 +139,14 @@ blob3 = data.frame( x = rnorm(30 , mean = 8 ),
 blobs <- bind_rows( blob1 , blob2, blob3)
 blobs <- blobs %>% mutate( label = as.factor(label) )
 
+print(blobs %>% head())
+
 ggplot(blobs, aes(x=x,y=y,col=label)) + geom_point()
 ```
 
-fitting a KNN classifier with tidymodel looks like this:
+
+#### Fitting a KNN classifier
+Using tidymodel, it looks like this:
 
 ```{r}
 # https://parsnip.tidymodels.org/reference/nearest_neighbor.html
@@ -153,28 +158,30 @@ pred <- KNN %>% predict(new_data = blobs)
 table( blobs$label , pred$.pred_class ) 
 ```
 
-Let's look at the effect of the number of neighbors:
+
+#### Varying the number of neighbours
+Let's look at the influence of the number of neighbors:
 
 ```{r}
 contour_KNN <- function(K,data,...){
-# Make a grid to predict the whole space:
-grid <-
-  crossing(
-    x = seq(-12, 12, length.out = 250),
-    y = seq(-12, 12, length.out = 250)
-  )
-KNN = nearest_neighbor(neighbors = K, 
-                       mode = 'classification',...) %>% 
-  fit( label ~ . , 
-       data = data)
-
-grid$knnres <- bind_cols(predict(KNN, grid))$.pred_class
-
-return(  ggplot(grid, aes(x = x, y = y)) +
-         geom_contour_filled(aes(z = as.numeric(knnres)) ,
-                             breaks=c(0.5,1.5,2.5,3.5))+
-         geom_point(data = blobs , aes(x=x,y=y,col=label)) +
-         ggtitle(paste("number of neighbors: ",K)) )
+  # Make a grid to predict the whole space:
+  grid <-
+    crossing(
+      x = seq(-12, 12, length.out = 250),
+      y = seq(-12, 12, length.out = 250)
+    )
+  KNN = nearest_neighbor(neighbors = K, 
+                         mode = 'classification',...) %>% 
+    fit( label ~ . , 
+         data = data)
+  
+  grid$knnres <- bind_cols(predict(KNN, grid))$.pred_class
+  
+  return(  ggplot(grid, aes(x = x, y = y)) +
+           geom_contour_filled(aes(z = as.numeric(knnres)) ,
+                               breaks=c(0.5,1.5,2.5,3.5))+
+           geom_point(data = blobs , aes(x=x,y=y,col=label)) +
+           ggtitle(paste("number of neighbors: ",K)) )
   
 }
 
@@ -189,15 +196,15 @@ contour_KNN(5,blobs)
 contour_KNN(89,blobs)
 ```
 
-In the above we varied the number of voters (neighbors) to decide whether a point is from one class or another.
+In the above, we varied the number of voters (neighbors) to decide whether a point is from one class or another.
 
-You can see how the **boundaries are way more wiggly and attentive to missclassification when the number of neighbors is low**.
+You can see how the **boundaries are way more wiggly and attentive to misclassification when the number of neighbors is low**.
 
-But you can also imagine that if **new data is added it is likely to be missclassified** with those kind of too specific boundaries.
+But you can also imagine that when **new data is added, it will likely be misclassified** with such overly-specific boundaries.
 
-Conversely, when the number of neighbors is very high (120 here), then the **model is not sensitive to point placement**.
+Conversely, when the number of neighbors is very high (120 here), then the **model is no longer sensitive to point placement**.
 
-This is a first example of the **bias variance trade off.**
+This is a first example of the **bias/variance trade-off.**
 
 We say that:
 
@@ -206,9 +213,10 @@ We say that:
 
 ------------------------------------------------------------------------
 
+#### Vote weighting
 Another parameter is **how voting is done**.
 
-This is controled by the `weight_func` argument which defines a *kernel* weighting neighbors according to their distances.
+This is controled by the `weight_func` argument which defines a *kernel* for weighting neighbors according to their distances.
 
 ![](https://upload.wikimedia.org/wikipedia/commons/4/47/Kernels.svg)
 
@@ -216,8 +224,8 @@ image source: wikipedia user Brian Amberg
 
 Choices here are:
 
- * `"rectangular"`: each chosen neighbor votes the same (which is the standard unweighted knn)
- * `"triangular"`: each chosen neighbors has a vote strength inversely proportional to the distance
+ * `"rectangular"`: each chosen neighbor votes the same (which is the standard unweighted KNN)
+ * `"triangular"`: each chosen neighbor has a vote strength inversely proportional to the distance
  * `"epanechnikov"` (or beta(2,2))
  * `"biweight"` (or beta(3,3)), 
  * `"triweight"` (or beta(4,4)), 
@@ -226,6 +234,8 @@ Choices here are:
  * `"inv"`
  * `"optimal"` : the default, a weighting scheme which accounts for the number of input dimensions ([Samworth 2012](https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-5/Optimal-weighted-nearest-neighbour-classifiers/10.1214/12-AOS1049.full))
 
+
+We can try out some of these:
 
 ```{r}
 contour_KNN(3,blobs , weight_func = 'rectangular')
@@ -245,7 +255,7 @@ There are many additional hyper-parameters we could consider as well:
 -   the imputation strategy
 -   the normalization strategy
 -   dimensionality reduction : how many PCA axes do I keep?
--   choice of the classification algorithm (KNN, logistic regression, ranfom forest, neural network, ...)
+-   choice of the classification algorithm (KNN, logistic regression, random forest, neural network, ...)
 
 ...
 
